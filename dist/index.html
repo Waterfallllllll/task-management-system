@@ -6,6 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Task Management System</title>
 	<link rel="stylesheet" href="assets/style.css">
+	<!-- FullCalendar CSS -->
+	<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.css' rel='stylesheet' />
 </head>
 
 <body>
@@ -22,20 +24,10 @@
 			</form>
 		</div>
 
-		<!-- Создание задач -->
-		<div class="task-section">
-			<h2>Создать задачу</h2>
-			<form id="taskForm">
-				<input type="text" id="taskTitle" placeholder="Название задачи" required>
-				<textarea id="taskDescription" placeholder="Описание задачи" required></textarea>
-				<button type="submit">Создать задачу</button>
-			</form>
-		</div>
-
-		<!-- Список задач -->
-		<div class="task-list-section">
-			<h2>Список задач</h2>
-			<ul id="taskList"></ul>
+		<!-- Календарь задач -->
+		<div class="calendar-section">
+			<h2>Календарь задач</h2>
+			<div id="calendar"></div>
 		</div>
 
 		<!-- Панель статистики -->
@@ -48,7 +40,33 @@
 		</div>
 	</div>
 
-	<script src="js/script.js"></script>
+	<!-- Модальное окно для создания задачи -->
+	<div id="taskModal" class="modal">
+		<div class="modal-content">
+			<h2>Создать задачу</h2>
+			<form id="taskForm">
+				<input type="text" id="taskTitle" placeholder="Название задачи" required>
+				<input type="time" id="taskStartTime" required>
+				<input type="time" id="taskEndTime" required>
+				<button type="submit">Создать задачу</button>
+				<button type="button" id="cancelTask">Отмена</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Модальное окно для завершения задачи -->
+	<div id="completeModal" class="modal">
+		<div class="modal-content">
+			<h2>Задача</h2>
+			<p id="modalTaskTitle"></p>
+			<button id="completeTaskButton">Завершить задачу</button>
+			<button id="closeCompleteModalButton">Закрыть</button>
+		</div>
+	</div>
+
+	<!-- FullCalendar JS -->
+	<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.7/index.global.min.js'></script>
+	<script src="script.js"></script>
 </body>
 
 </html>
