@@ -1,0 +1,132 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"], input[type="password"], input[type="time"] {
+    width: 95%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    padding: 10px;
+    background-color: #e9ecef;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.stats-section p {
+    font-size: 18px;
+    margin: 5px 0;
+}
+
+.calendar-section {
+    margin-top: 20px;
+}
+
+#calendar {
+    max-width: 100%;
+    margin: 0 auto;
+    height: 500px; /* Задаем высоту календаря, чтобы он был компактным */
+    overflow: hidden;
+}
+
+.task-section form {
+    margin-top: 20px;
+}
+
+.fc-timeGridWeek-view {
+    font-size: 0.9em; /* Уменьшаем размер шрифта для более компактного вида */
+}
+
+.fc-col-header-cell {
+    padding: 0.5em; /* Уменьшаем отступы в заголовках колонок */
+}
+
+.fc-event {
+    font-size: 0.8em; /* Уменьшаем размер шрифта для событий */
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 8px;
+}
+#completeTaskButton {
+    background-color: #5bc0de;
+}
+
+#completeTaskButton:hover {
+    background-color: #31b0d5;
+}
+
+#closeModalButton {
+    background-color: #d9534f;
+}
+
+
+#closeModalButton:hover {
+    background-color: #c9302c;
+}
+
+.fc-event.completed {
+    text-decoration: line-through;
+    background-color: #d3d3d3;
+    color: #a9a9a9;
+}
