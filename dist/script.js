@@ -2,7 +2,9 @@
 /*!************************!*\
   !*** ./src/js/main.js ***!
   \************************/
-document.addEventListener("DOMContentLoaded", async function () {
+// script.js
+
+document.addEventListener("DOMContentLoaded", function () {
   const taskForm = document.getElementById("taskForm");
   const taskTitleInput = document.getElementById("taskTitle");
   const taskStartTimeInput = document.getElementById("taskStartTime");
@@ -15,9 +17,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const modalTaskTitle = document.getElementById("modalTaskTitle");
   const completeTaskButton = document.getElementById("completeTaskButton");
   const closeCompleteModalButton = document.getElementById("closeCompleteModalButton");
-  const tasks = []; // Определение переменной tasks
-
-  const yourAuthToken = localStorage.getItem("authToken"); // Получение токена
+  const tasks = [];
 
   // Инициализация календаря
   const calendarEl = document.getElementById("calendar");
@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       title: task.title,
       start: task.startDate,
       end: task.endDate,
+      description: task.description,
       id: task.id,
       classNames: task.completed ? ["completed"] : []
     })),
@@ -36,21 +37,24 @@ document.addEventListener("DOMContentLoaded", async function () {
       taskModal.style.display = "block";
       taskStartTimeInput.value = info.startStr.split("T")[1];
       taskEndTimeInput.value = info.endStr.split("T")[1];
-      taskForm.onsubmit = async function (e) {
+      taskForm.onsubmit = function (e) {
         e.preventDefault();
         const task = {
+          id: Date.now().toString(),
           title: taskTitleInput.value,
           startDate: info.startStr.split("T")[0] + "T" + taskStartTimeInput.value,
-          endDate: info.endStr.split("T")[0] + "T" + taskEndTimeInput.value
+          endDate: info.endStr.split("T")[0] + "T" + taskEndTimeInput.value,
+          description: "",
+          completed: false
         };
-        const newTask = await createTask(task.title, task.startDate, task.endDate);
-        tasks.push(newTask);
+        tasks.push(task);
         calendar.addEvent({
-          title: newTask.title,
-          start: newTask.startDate,
-          end: newTask.endDate,
-          id: newTask.id,
-          classNames: newTask.completed ? ["completed"] : []
+          title: task.title,
+          start: task.startDate,
+          end: task.endDate,
+          description: task.description,
+          id: task.id,
+          classNames: task.completed ? ["completed"] : []
         });
         taskModal.style.display = "none";
         updateStats();
@@ -59,11 +63,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     eventClick: function (info) {
       modalTaskTitle.textContent = info.event.title;
       completeModal.style.display = "block";
-      completeTaskButton.onclick = async function () {
+      completeTaskButton.onclick = function () {
         const event = info.event;
         const task = tasks.find(task => task.id === event.id);
         if (task) {
-          await completeTask(task.id);
           task.completed = true;
           event.setProp("classNames", ["completed"]);
           completeModal.style.display = "none";
@@ -73,22 +76,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
   calendar.render();
-
-  // Загрузка задач и статистики
-  const initialTasks = await getTasks();
-  initialTasks.forEach(task => {
-    tasks.push(task);
-    calendar.addEvent({
-      title: task.title,
-      start: task.startDate,
-      end: task.endDate,
-      id: task.id,
-      classNames: task.completed ? ["completed"] : []
-    });
-  });
-  const stats = await getStats();
-  totalTasks.textContent = stats.totalTasks;
-  completedTasks.textContent = stats.completedTasks;
 
   // Обработка отмены создания задачи
   cancelTaskButton.addEventListener("click", function () {
@@ -101,66 +88,53 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 
   // Функция для обновления статистики задач
-  async function updateStats() {
-    const stats = await getStats();
-    totalTasks.textContent = stats.totalTasks;
-    completedTasks.textContent = stats.completedTasks;
+  function updateStats() {
+    totalTasks.textContent = tasks.length;
+    completedTasks.textContent = tasks.filter(task => task.completed).length;
   }
-
-  // Функция для создания задачи
-  async function createTask(title, startDate, endDate) {
-    const response = await fetch("http://localhost:3002/tasks", {
+  document.querySelector("[data-login]").addEventListener("submit", async event => {
+    event.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const response = await fetch("http://localhost:5000/auth/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${yourAuthToken}` // Используем полученный токен
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        title,
-        startDate,
-        endDate
+        username,
+        password
       })
     });
     const data = await response.json();
-    return data;
-  }
-
-  // Функция для получения задач
-  async function getTasks() {
-    const response = await fetch("http://localhost:3002/tasks", {
-      method: "GET",
+    if (response.ok) {
+      // Сохраняем токен в localStorage
+      localStorage.setItem("token", data.token);
+      alert("Login successful");
+    } else {
+      alert("Login failed");
+    }
+  });
+  document.querySelector("[data-registr]").addEventListener("submit", async event => {
+    event.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const response = await fetch("http://localhost:5000/auth/registration", {
+      method: "POST",
       headers: {
-        "Authorization": `Bearer ${yourAuthToken}`
-      } // Используем полученный токен
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username,
+        password
+      })
     });
-    const data = await response.json();
-    return data;
-  }
-
-  // Функция для завершения задачи
-  async function completeTask(taskId) {
-    const response = await fetch(`http://localhost:3002/tasks/${taskId}/complete`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${yourAuthToken}` // Используем полученный токен
-      }
-    });
-    const data = await response.json();
-    return data;
-  }
-
-  // Функция для получения статистики
-  async function getStats() {
-    const response = await fetch("http://localhost:3003/stats", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${yourAuthToken}`
-      } // Используем полученный токен
-    });
-    const data = await response.json();
-    return data;
-  }
+    if (response.ok) {
+      alert("Registration successful");
+    } else {
+      alert("Registration failed");
+    }
+  });
 });
 /******/ })()
 ;
