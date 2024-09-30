@@ -121,8 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		const username = document.getElementById("registerUsername").value;
 		const password = document.getElementById("registerPassword").value;
-
-		const response = await fetch("http://localhost:5000/auth/registration", {
+		// http://localhost:5001/auth/registration
+		const response = await fetch("http://localhost:5001/register", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"

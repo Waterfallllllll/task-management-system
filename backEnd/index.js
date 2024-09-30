@@ -1,25 +1,15 @@
-// const express = require("express");
-// const cors = require("cors");
-// const authRoutes = require("../backEnd/routes/authRoutes"); // Импортируй маршруты
-
-// const app = express();
-// const PORT = process.env.PORT || 5001;
-
-// app.use(cors());
-// app.use(express.json());
-
-// // Подключаем маршруты
-// app.use("/auth", authRoutes);
-
-// app.listen(PORT, () => {
-// 	console.log(`Backend server is running on port ${PORT}`);
-// });
-
-
 const express = require("express");
-const authService = require("./services/authService"); // Взаимодействие с микросервисом
+const cors = require("cors"); // Добавляем пакет cors
+const authService = require("./services/authService"); 
 const app = express();
 app.use(express.json());
+
+
+app.use(cors({
+	origin: "https://tasklist.local", // Здесь указываешь тот домен, откуда будут запросы
+	methods: ["GET", "POST", "PUT", "DELETE"],
+	allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
 app.post("/login", async (req, res) => {
 	try {
@@ -27,6 +17,15 @@ app.post("/login", async (req, res) => {
 		res.json({ token });
 	} catch (error) {
 		res.status(500).json({ error: "Login failed" });
+	}
+});
+
+app.post("/register", async (req, res) => {
+	try {
+		const newUser = await authService.registerUser(req.body);
+		res.json({ message: "Registration successful", newUser });
+	} catch (error) {
+		res.status(500).json({ error: "Registration failed" });
 	}
 });
 
