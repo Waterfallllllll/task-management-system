@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		const username = document.getElementById("loginUsername").value;
 		const password = document.getElementById("loginPassword").value;
 
-		const response = await fetch("http://localhost:5000/auth/login", {
+		const response = await fetch("http://localhost:5001/login", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
