@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - task_management_network
+
+  backend:
+    build:
+      context: ./backEnd
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - task_management_network
+
+networks:
+  task_management_network:
+    driver: bridge

@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const authServiceURL = "http://localhost:5000/auth"; // URL вашего микросервиса
+const authServiceURL = "http://auth-service:5000/auth"; // URL вашего микросервиса
 
 // Функция для регистрации пользователя
 async function registerUser(userData) {
