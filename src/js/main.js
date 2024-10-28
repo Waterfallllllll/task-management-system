@@ -13,8 +13,12 @@ document.addEventListener("DOMContentLoaded", function () {
 	const modalTaskTitle = document.getElementById("modalTaskTitle");
 	const completeTaskButton = document.getElementById("completeTaskButton");
 	const closeCompleteModalButton = document.getElementById("closeCompleteModalButton");
+	const cont = document.querySelector(".mega-block");
 
 	const tasks = [];
+	window.addEventListener("beforeunload", function () {
+		localStorage.clear();
+	});
 
 	// Инициализация календаря
 	const calendarEl = document.getElementById("calendar");
@@ -90,6 +94,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		completedTasks.textContent = tasks.filter(task => task.completed).length;
 	}
 
+	if (localStorage.getItem("token")) {
+		cont.style.display = "block";
+	} else {
+		cont.style.display = "none";
+	}
 
 
 	document.getElementById("loginForm").addEventListener("submit", async (event) => {
@@ -98,22 +107,50 @@ document.addEventListener("DOMContentLoaded", function () {
 		const username = document.getElementById("loginUsername").value;
 		const password = document.getElementById("loginPassword").value;
 
-		const response = await fetch("http://localhost:5001/login", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({ username, password })
+		const block = document.getElementById("loginForm");
+		const form = document.querySelectorAll(".form");
+		const megaBlock = document.querySelector(".mega-block");
+
+		const statusImg = document.createElement("img");
+		statusImg.classList.add("animated", "fadeInUp");
+		statusImg.style.display = "block";
+		statusImg.style.margin = "0 auto";
+		statusImg.style.marginTop = "20%";
+
+		form.forEach(item => {
+			item.classList.add("animated", "fadeInUp");
+			
+			item.style.display = "none";
 		});
+		block.parentElement.append(statusImg);
 
-		const data = await response.json();
 
-		if (response.ok) {
-			localStorage.setItem("token", data.token);
-			alert("Login successful");
-		} else {
-			alert("Login failed");
-		}
+		getResources("http://localhost:5001/login", username, password)
+			.then((data) => {
+
+				localStorage.setItem("token", JSON.stringify(data.token.token));
+				block.parentElement.append(statusImg);
+				statusImg.setAttribute("src", "assets/img/ok.png");
+			})
+			.catch((err) => {
+				console.error(err);
+				block.parentElement.append(statusImg);
+				statusImg.setAttribute("src", "assets/img/fail.png");
+					 })
+			.finally(() => {
+				setTimeout(() => {
+				
+					megaBlock.classList.add("animated", "fadeInUp");
+					statusImg.remove();
+
+						
+					if (localStorage.getItem("token")) {
+						cont.style.display = "block";
+					} else {
+						cont.style.display = "none";
+					}
+				}, 2000);
+			});
 	});
 
 	document.getElementById("registerForm").addEventListener("submit", async function (event) {
@@ -121,8 +158,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
 		const username = document.getElementById("registerUsername").value;
 		const password = document.getElementById("registerPassword").value;
-		// http://localhost:5001/auth/registration
-		const response = await fetch("http://localhost:5001/register", {
+		const block = document.getElementById("registerForm");
+		const form = document.querySelectorAll(".form");
+		const megaBlock = document.querySelector(".mega-block");
+
+		const statusImg = document.createElement("img");
+		statusImg.classList.add("animated", "fadeInUp");
+		statusImg.style.display = "block";
+		statusImg.style.margin = "0 auto";
+		statusImg.style.marginTop = "20%";
+
+		form.forEach(item => {
+			item.classList.add("animated", "fadeInUp");
+
+			item.style.display = "none";
+		});
+		block.parentElement.append(statusImg);
+
+
+		getResources("http://localhost:5001/register", username, password)
+			.then((data) => {
+
+				localStorage.setItem("token", JSON.stringify(data.newUser.token));
+				block.parentElement.append(statusImg);
+				statusImg.setAttribute("src", "assets/img/ok.png");
+			})
+			.catch((err) => {
+				console.error(err);
+				block.parentElement.append(statusImg);
+				statusImg.setAttribute("src", "assets/img/fail.png");
+					 })
+			.finally(() => {
+				setTimeout(() => {
+				
+					megaBlock.classList.add("animated", "fadeInUp");
+					statusImg.remove();
+
+						
+					if (localStorage.getItem("token")) {
+						cont.style.display = "block";
+					} else {
+						cont.style.display = "none";
+					}
+				}, 2000);
+			});
+	});
+
+
+	async function getResources(path, username, password) {
+		const res = await fetch(path, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json"
@@ -130,11 +214,12 @@ document.addEventListener("DOMContentLoaded", function () {
 			body: JSON.stringify({ username, password })
 		});
 
-		if (response.ok) {
-			alert("Registration successful");
-		} else {
-			alert("Registration failed");
+		if (!res.ok) { 
+
+			throw new Error(`Could not fetch ${url}, status: ${res.status}`); 
 		}
-	});
+
+		return await res.json(); 
+	}
 
 });

@@ -19,15 +19,12 @@ exports.loginUser = async (req, res) => {
 	}
 
 	const token = jwt.sign({ userId: user._id }, "secretKey", { expiresIn: "1h" });
-	res.json({ token });
+	return res.json({ token });
 };
 
 exports.registerUser = async (req, res) => {
 	try {
-		// const errors = validationResult(req);
-		// if (!errors.isEmpty()) {
-		// 	return res.status(400).json({message: "Ошибка при регистрации", errors});
-		// }
+
 		const {username, password} = req.body;
 		const candidate = await User.findOne({username});
 		if (candidate) {
@@ -37,7 +34,13 @@ exports.registerUser = async (req, res) => {
 		const userRole = await Role.findOne({value: "USER"});
 		const user = new User({username, password: hashPassword, roles: [userRole.value]});
 		await user.save();
-		return res.json({message: "Пользователь успешно зарегистрирован"});
+
+		// Генерация токена для нового пользователя
+		const token = jwt.sign({ userId: user._id }, "secretKey", { expiresIn: "1h" });
+
+		// Возвращение токена и сообщения
+		return res.json({ message: "Пользователь успешно зарегистрирован", token });
+		
 	} catch (e) {
 		console.log(e);
 		res.status(400).json({message: "Registration error"});
